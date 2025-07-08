@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orbital Countdown Timer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #7c3aed;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: #23262f;
+      padding: 2rem 2.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    label {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+    input[type="number"] {
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid #ccc;
+      font-size: 1.1rem;
+      width: 120px;
+      margin-right: 0.5rem;
+    }
+    button {
+      background: #ffe066;
+      color: #222;
+      border: none;
+      border-radius: 0.5rem;
+      padding: 0.6rem 1.5rem;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    button:hover {
+      background: #fff275;
+    }
+    .countdown {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-top: 1rem;
+      min-height: 2.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <label for="secondsInput">Enter seconds:</label>
+    <div>
+      <input type="number" id="secondsInput" min="1" placeholder="60">
+      <button id="startBtn">Start Countdown</button>
+    </div>
+    <div class="countdown" id="countdownDisplay"></div>
+  </div>
+  <script>
+    const startBtn = document.getElementById('startBtn');
+    const secondsInput = document.getElementById('secondsInput');
+    const countdownDisplay = document.getElementById('countdownDisplay');
+    let timer = null;
+
+    // Function to play a beep sound
+    function playBeep() {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = ctx.createOscillator();
+      oscillator.type = 'sine';
+      oscillator.frequency.value = 440; // Standard A note
+      oscillator.connect(ctx.destination);
+      oscillator.start();
+      setTimeout(() => {
+        oscillator.stop();
+        ctx.close();
+      }, 120); // Beep duration in ms
+    }
+
+    function startCountdown() {
+      let seconds = parseInt(secondsInput.value, 10);
+      if (isNaN(seconds) || seconds < 1) {
+        countdownDisplay.textContent = 'Please enter a valid number of seconds.';
+        return;
+      }
+      startBtn.disabled = true;
+      secondsInput.disabled = true;
+      countdownDisplay.textContent = seconds;
+      timer = setInterval(() => {
+        seconds--;
+        if (seconds > 0) {
+          countdownDisplay.textContent = seconds;
+          if (seconds <= 10) {
+            playBeep();
+          }
+        } else {
+          clearInterval(timer);
+          countdownDisplay.textContent = "Time's up!";
+          startBtn.disabled = false;
+          secondsInput.disabled = false;
+        }
+      }, 1000);
+    }
+
+    startBtn.addEventListener('click', () => {
+      playBeep(); // Play beep on button press
+      if (timer) clearInterval(timer);
+      startCountdown();
+    });
+
+    secondsInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        startBtn.click();
+      }
+    });
+  </script>
+</body>
+</html> 
